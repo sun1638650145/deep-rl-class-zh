@@ -1,0 +1,6 @@
+.DS_store
+.idea/
+# 忽略运行缓存.
+.ipynb_checkpoints/
+# 忽略保存的模型.
+*.zip
