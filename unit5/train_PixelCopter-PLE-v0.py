@@ -2,6 +2,7 @@
 from collections import deque
 
 import gym
+import gym_pygame
 import numpy as np
 
 import torch
@@ -41,6 +42,8 @@ class GradientPolicy(nn.Module):
 
     def forward(self, x):
         """定义前向传播."""
+        x = x.to(torch.float32)
+
         x = self.fc1(x)
         x = F.relu(x)
         x = self.fc2(x)
@@ -132,8 +135,7 @@ def evaluate(env, policy, n_eval_episodes, max_steps):
 
 if __name__ == '__main__':
     # 创建环境.
-    env = gym.make(id='CartPole-v1')
-    env.reset()
+    env = gym.make(id='Pixelcopter-PLE-v0')
 
     # 获取设备.
     device = get_device()
@@ -141,18 +143,19 @@ if __name__ == '__main__':
     # 创建模型.
     policy = GradientPolicy(env.observation_space.shape[0],
                             env.action_space.n,
+                            hidden_layer=64,
                             device=device).to(device)
     optimizer = optim.Adam(params=policy.parameters(),
-                           lr=5e-3)
+                           lr=1e-4)
 
     # 训练模型.
     train(env=env,
           policy=policy,
           optimizer=optimizer,  # 使用的优化器.
-          n_training_episodes=25000,  # 训练的总轮数.
-          max_steps=100,  # 每轮的最大步数.
-          gamma=1.0,  # 衰减系数.
-          verbose=False)  # 是否显示日志.
+          n_training_episodes=50000,  # 训练的总轮数.
+          max_steps=1000,  # 每轮的最大步数.
+          gamma=0.99,  # 衰减系数.
+          verbose=1000)  # 是否显示日志.
 
     # 评估模型.
     mean_reward, std_reward = evaluate(env=env,
