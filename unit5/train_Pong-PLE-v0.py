@@ -36,7 +36,8 @@ class GradientPolicy(nn.Module):
         super(GradientPolicy, self).__init__()
 
         self.fc1 = nn.Linear(state_space, hidden_layer)
-        self.fc2 = nn.Linear(hidden_layer, action_space)
+        self.fc2 = nn.Linear(hidden_layer, hidden_layer * 2)
+        self.fc3 = nn.Linear(hidden_layer * 2, action_space)
 
         self.device = device  # 模型和张量使用的计算设备.
 
@@ -47,6 +48,8 @@ class GradientPolicy(nn.Module):
         x = self.fc1(x)
         x = F.relu(x)
         x = self.fc2(x)
+        x = F.relu(x)
+        x = self.fc3(x)
 
         return F.softmax(x, dim=-1)
 
@@ -135,7 +138,8 @@ def evaluate(env, policy, n_eval_episodes, max_steps):
 
 if __name__ == '__main__':
     # 创建环境.
-    env = gym.make(id='Pixelcopter-PLE-v0')
+    env = gym.make(id='Pong-PLE-v0')
+    env_id = 'Pong-PLE-v0'
 
     # 获取设备.
     device = get_device()
@@ -146,20 +150,20 @@ if __name__ == '__main__':
                             hidden_layer=64,
                             device=device).to(device)
     optimizer = optim.Adam(params=policy.parameters(),
-                           lr=1e-4)
+                           lr=1e-2)
 
     # 训练模型.
     train(env=env,
           policy=policy,
           optimizer=optimizer,  # 使用的优化器.
-          n_training_episodes=50000,  # 训练的总轮数.
-          max_steps=1000,  # 每轮的最大步数.
+          n_training_episodes=20000,  # 训练的总轮数.
+          max_steps=5000,  # 每轮的最大步数.
           gamma=0.99,  # 衰减系数.
           verbose=1000)  # 是否显示日志.
 
     # 评估模型.
     mean_reward, std_reward = evaluate(env=env,
                                        policy=policy,
-                                       n_eval_episodes=100,  # 测试的总轮数.
-                                       max_steps=100)  # 每轮的最大步数.
+                                       n_eval_episodes=10,  # 测试的总轮数.
+                                       max_steps=5000)  # 每轮的最大步数.
     print(f'平均奖励: {mean_reward:.2f} +/- {std_reward:.2f}')
