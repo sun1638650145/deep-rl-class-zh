@@ -31,20 +31,17 @@ class GradientPolicy(nn.Module):
     def __init__(self,
                  state_space,
                  action_space,
-                 hidden_layer=16,
                  device=torch.device('cpu')):
         super(GradientPolicy, self).__init__()
 
-        self.fc1 = nn.Linear(state_space, hidden_layer)
-        self.fc2 = nn.Linear(hidden_layer, hidden_layer * 2)
-        self.fc3 = nn.Linear(hidden_layer * 2, action_space)
+        self.fc1 = nn.Linear(state_space, 32)
+        self.fc2 = nn.Linear(32, 64)
+        self.fc3 = nn.Linear(64, action_space)
 
         self.device = device  # 模型和张量使用的计算设备.
 
     def forward(self, x):
         """定义前向传播."""
-        x = x.to(torch.float32)
-
         x = self.fc1(x)
         x = F.relu(x)
         x = self.fc2(x)
@@ -55,7 +52,7 @@ class GradientPolicy(nn.Module):
 
     def action(self, state):
         """给定一个状态获得动作."""
-        state = torch.from_numpy(state).unsqueeze(0).to(torch.float32).to(self.device)
+        state = torch.from_numpy(state).unsqueeze(0).float().to(self.device)
         probs = self.forward(state)
 
         # 创建一个样本空间进行采样.
@@ -110,7 +107,7 @@ def train(env, policy, optimizer, n_training_episodes, max_steps, gamma, verbose
 
         # 显示训练进度信息.
         if verbose and episode % verbose == 0:
-            print(f'第{episode}轮, 平均奖励: {np.mean(rewards):.2f}, 损失值: {loss:.2f}')
+            print(f'第{episode}轮, 平均奖励: {np.mean(rewards):.2f}')
 
 
 def evaluate(env, policy, n_eval_episodes, max_steps):
@@ -147,23 +144,24 @@ if __name__ == '__main__':
     # 创建模型.
     policy = GradientPolicy(env.observation_space.shape[0],
                             env.action_space.n,
-                            hidden_layer=64,
                             device=device).to(device)
     optimizer = optim.Adam(params=policy.parameters(),
-                           lr=1e-2)
+                           lr=1e-1)
 
     # 训练模型.
     train(env=env,
           policy=policy,
           optimizer=optimizer,  # 使用的优化器.
-          n_training_episodes=20000,  # 训练的总轮数.
-          max_steps=5000,  # 每轮的最大步数.
+          n_training_episodes=100000,  # 训练的总轮数.
+          max_steps=1000,  # 每轮的最大步数.
           gamma=0.99,  # 衰减系数.
-          verbose=1000)  # 是否显示日志.
+          verbose=50)  # 是否显示日志.
+    # 保存模型.
+    torch.save(policy, './model.pt')
 
     # 评估模型.
     mean_reward, std_reward = evaluate(env=env,
                                        policy=policy,
                                        n_eval_episodes=10,  # 测试的总轮数.
-                                       max_steps=5000)  # 每轮的最大步数.
+                                       max_steps=1000)  # 每轮的最大步数.
     print(f'平均奖励: {mean_reward:.2f} +/- {std_reward:.2f}')

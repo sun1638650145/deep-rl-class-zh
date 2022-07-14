@@ -42,8 +42,6 @@ class GradientPolicy(nn.Module):
 
     def forward(self, x):
         """定义前向传播."""
-        x = x.to(torch.float32)
-
         x = self.fc1(x)
         x = F.relu(x)
         x = self.fc2(x)
@@ -52,7 +50,7 @@ class GradientPolicy(nn.Module):
 
     def action(self, state):
         """给定一个状态获得动作."""
-        state = torch.from_numpy(state).unsqueeze(0).to(torch.float32).to(self.device)
+        state = torch.from_numpy(state).unsqueeze(0).float().to(self.device)
         probs = self.forward(state)
 
         # 创建一个样本空间进行采样.
@@ -107,7 +105,7 @@ def train(env, policy, optimizer, n_training_episodes, max_steps, gamma, verbose
 
         # 显示训练进度信息.
         if verbose and episode % verbose == 0:
-            print(f'第{episode}轮, 平均奖励: {np.mean(rewards):.2f}, 损失值: {loss:.2f}')
+            print(f'第{episode}轮, 平均奖励: {np.mean(rewards):.2f}')
 
 
 def evaluate(env, policy, n_eval_episodes, max_steps):
@@ -160,6 +158,6 @@ if __name__ == '__main__':
     # 评估模型.
     mean_reward, std_reward = evaluate(env=env,
                                        policy=policy,
-                                       n_eval_episodes=100,  # 测试的总轮数.
+                                       n_eval_episodes=10,  # 测试的总轮数.
                                        max_steps=100)  # 每轮的最大步数.
     print(f'平均奖励: {mean_reward:.2f} +/- {std_reward:.2f}')

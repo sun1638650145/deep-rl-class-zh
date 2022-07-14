@@ -104,7 +104,7 @@ def train(env, policy, optimizer, n_training_episodes, max_steps, gamma, verbose
 
         # 显示训练进度信息.
         if verbose and episode % verbose == 0:
-            print(f'第{episode}轮, 平均奖励: {np.mean(rewards):.2f}, 损失值: {loss:.2f}')
+            print(f'第{episode}轮, 平均奖励: {np.mean(rewards):.2f}')
 
 
 def evaluate(env, policy, n_eval_episodes, max_steps):
@@ -143,20 +143,20 @@ if __name__ == '__main__':
                             env.action_space.n,
                             device=device).to(device)
     optimizer = optim.Adam(params=policy.parameters(),
-                           lr=5e-3)
+                           lr=1e-2)
 
     # 训练模型.
     train(env=env,
           policy=policy,
           optimizer=optimizer,  # 使用的优化器.
-          n_training_episodes=25000,  # 训练的总轮数.
-          max_steps=100,  # 每轮的最大步数.
+          n_training_episodes=1000,  # 训练的总轮数.
+          max_steps=1000,  # 每轮的最大步数.
           gamma=1.0,  # 衰减系数.
-          verbose=False)  # 是否显示日志.
+          verbose=10)  # 是否显示日志.
 
     # 评估模型.
     mean_reward, std_reward = evaluate(env=env,
                                        policy=policy,
-                                       n_eval_episodes=100,  # 测试的总轮数.
-                                       max_steps=100)  # 每轮的最大步数.
+                                       n_eval_episodes=10,  # 测试的总轮数.
+                                       max_steps=1000)  # 每轮的最大步数.
     print(f'平均奖励: {mean_reward:.2f} +/- {std_reward:.2f}')
