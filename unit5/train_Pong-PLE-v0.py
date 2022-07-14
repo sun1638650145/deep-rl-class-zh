@@ -16,7 +16,7 @@ def get_device():
     """获取可用的计算设备."""
     if torch.cuda.is_available():
         device = torch.device('cuda:0')
-    elif torch.backends.mps.is_available() and torch.backends.mps.is_built():
+    elif torch.backends.mps.is_available():
         device = torch.device('mps')
     else:
         device = torch.device('cpu')
