@@ -5,6 +5,7 @@ import pybullet_envs  # 用于创建第三方环境.
 from stable_baselines3 import A2C
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.evaluation import evaluate_policy
+from stable_baselines3.common.vec_env import VecNormalize
 
 
 if __name__ == '__main__':
@@ -13,6 +14,11 @@ if __name__ == '__main__':
 
     # 创建一组并行环境.
     envs = make_vec_env('AntBulletEnv-v0', n_envs=4)
+    envs = VecNormalize(venv=envs,
+                        training=True,
+                        norm_obs=True,
+                        norm_reward=True,
+                        clip_obs=10.0)
     # 创建模型并训练.
     model = A2C(policy='MlpPolicy',
                 env=envs,
@@ -31,8 +37,9 @@ if __name__ == '__main__':
                                    ortho_init=False),
                 verbose=1)
     model.learn(total_timesteps=2000000)
-    # 保存模型.
+    # # 保存模型和环境.
     # model.save('./a2c-AntBulletEnv-v0')
+    # envs.save('vec_normalize.pkl')
 
     # 禁止更新参数和标准化.
     env.training = False
