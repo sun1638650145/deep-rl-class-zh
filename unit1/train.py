@@ -44,7 +44,7 @@ if __name__ == '__main__':
     # 保存模型.
     # model.save('./ppo-LunarLander-v2')
 
-    # 评估模型并返回平均奖励.|`tuple`
+    # 评估模型并返回平均奖励.
     mean_reward, std_reward = evaluate_policy(model=model,  # base_class.BaseAlgorithm|你想评估的模型.
                                               env=env,  # gym.env|Gym环境.
                                               n_eval_episodes=10,  # int|10|评估周期.
