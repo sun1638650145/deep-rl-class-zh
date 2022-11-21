@@ -25,11 +25,10 @@ def show_env(env):
 
 if __name__ == '__main__':
     # 创建环境.
-    env = gym.make('LunarLander-v2')
-    # show_env(env)
+    envs = make_vec_env('LunarLander-v2', n_envs=16)  # 并行训练环境.
+    eval_env = gym.make('LunarLander-v2')  # 验证环境.
+    # show_env(eval_env)
 
-    # 创建一组并行环境.
-    envs = make_vec_env('LunarLander-v2', n_envs=16)
     # 创建模型并训练.
     model = PPO(policy='MlpPolicy',
                 env=envs,
@@ -39,14 +38,15 @@ if __name__ == '__main__':
                 gamma=0.999,
                 gae_lambda=0.98,
                 ent_coef=0.01,
-                verbose=1)
+                verbose=1,
+                device='cpu')
     model.learn(total_timesteps=1000000)
     # 保存模型.
-    # model.save('./ppo-LunarLander-v2')
+    model.save('./PPO-LunarLander-v2')
 
     # 评估模型并返回平均奖励.
     mean_reward, std_reward = evaluate_policy(model=model,  # base_class.BaseAlgorithm|你想评估的模型.
-                                              env=env,  # gym.env|Gym环境.
+                                              env=eval_env,  # gym.env|Gym环境.
                                               n_eval_episodes=10,  # int|10|评估周期.
                                               deterministic=True)  # bool|True|使用确定动作还是随机动作.
     print(mean_reward, std_reward)
