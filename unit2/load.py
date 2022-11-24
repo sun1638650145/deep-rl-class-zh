@@ -1,3 +1,4 @@
+"""从Hugging Face Hub加载模型."""
 import gym
 import numpy as np
 import pickle5 as pickle
@@ -71,4 +72,4 @@ if __name__ == '__main__':
                                        max_steps=model['max_steps'],
                                        n_eval_episodes=model['n_eval_episodes'],
                                        Qtable=model['qtable'])
-    print(f'平均奖励: {mean_reward:.2f} +/- {std_reward:.2f}')
+    print(mean_reward, std_reward)

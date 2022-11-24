@@ -1,3 +1,4 @@
+"""训练Q-Learning智能体."""
 import gym
 import numpy as np
 
@@ -34,7 +35,6 @@ def epsilon_greedy_policy(Qtable, state, epsilon):
 
 def greedy_policy(Qtable, state):
     """greedy策略."""
-
     # 经验: 采取具有最大值的动作.
     action = np.argmax(Qtable[state])
 
@@ -116,10 +116,10 @@ if __name__ == '__main__':
                         learning_rate=0.7,  # 学习率.
                         gamma=0.95)  # 衰减系数.
 
-    # 评估模型.
+    # 评估模型并返回平均奖励.
     mean_reward, std_reward = evaluate(env=env,
                                        max_steps=99,  # 每轮的最大步数.
                                        n_eval_episodes=100,  # 测试的总轮数.
                                        Qtable=Qtable_taxi,
                                        seed=eval_seed)  # 评估种子.
-    print(f'平均奖励: {mean_reward:.2f} +/- {std_reward:.2f}')
+    print(mean_reward, std_reward)
