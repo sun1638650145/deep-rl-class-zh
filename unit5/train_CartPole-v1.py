@@ -115,6 +115,10 @@ class GradientPolicy(nn.Module):
 
         return np.mean(rewards), np.std(rewards)
 
+    def save(self, filepath):
+        """保存模型."""
+        torch.save(self, filepath)
+
     def _forward(self, x):
         """定义前向传播."""
         x = self.fc1(x)
@@ -155,6 +159,8 @@ if __name__ == '__main__':
               max_steps=1000,  # 每轮的最大步数.
               gamma=1.0,  # 衰减系数.
               verbose=10)  # 是否显示日志.
+    # 保存模型.
+    model.save('./model.pt')
 
     # 评估模型.
     mean_reward, std_reward = model.evaluate(env=env,
